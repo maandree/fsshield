@@ -1,0 +1,68 @@
+NAME
+	fsshield - Limit a new process's access to the filesystem
+
+SYNOPSIS
+	fsshield [-a file] ... [-r file] ... [-t file] ... [-nR] utility [argument] ...
+
+DESCRIPTION
+	The fsshield utility runs a specified utility, but limits it's access to
+	the filesystem. By default it gives read-only access to some fundamental
+	directories and /etc/passwd, access to the current working directory, and
+	clean tmpfs mounts on /tmp and /var/tmp.
+
+	In this man page, "read-only" means that a bind-mount with the read-only
+	option is created. Other accessible files are normal bind-mounts. The
+	permissions on the files are not modified.
+
+OPTIONS
+	The following options are supported:
+
+	-a file
+		Make file accessible.
+
+	-r file
+		Make file accessible but read-only.
+
+	-t file
+		Mount a tmpfs on file.
+
+	-n
+		Do not apply the preset file accesses.
+
+	-R
+		Make the current working directory read-only.
+
+	The order of options do not matter, however -a overrides -r and -t,
+	while -r overrides -t. The preset files accesses are
+	-t /tmp -t /var/tmp -r /var/empty -r /etc/passwd -r /usr -r /bin
+	-r /sbin -r /lib -r /lib64 -r /lib32 -r /libexec, however limited
+	to files that exist (including broken symlinks). Additionally
+	the current working directory is always accessible (-a ., or
+	if -R is used: -r .), regardless of the use of -n.
+
+OPERANDS
+	The following operands are supported:
+
+	utility
+		The name of the utility to be invoked.
+
+	argument
+		A string to pass as an argument for the invoked utility.
+
+EXIT STATUS
+	If utility is invoked, the exit status of fsshield is the exit status
+	of utility; otherwise, the fsshield utility exits with one of the
+	following values:
+
+	125    An error occurred in the fsshield utility.
+
+	126    The utility specified by utility was found but could not be invoked.
+
+	127    The utility specified by utility could not be found.
+
+NOTES
+	The files can be any type of file, including directories, not just
+	regular files.
+
+SEE ALSO
+	None.

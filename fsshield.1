@@ -1,0 +1,145 @@
+.TH FSSHIELD 1 FSSHIELD
+.SH NAME
+fsshield \- Limit a new process's access to the filesystem
+
+.SH SYNOPSIS
+.B fsshield
+.RB [ -a
+.IR file ]\ ...\,
+.BR [ -r
+.IR file ]\ ...\,
+.RB [ -t
+.IR file ]\ ...\,
+.RB [ -nR ]
+.I utility
+.RI [ argument ]\ ...
+
+.SH DESCRIPTION
+The
+.B
+fsshield utility runs a specified utility, but limits it's access to
+the filesystem. By default it gives read-only access to some fundamental
+directories and
+.IR /etc/passwd ,
+access to the current working directory, and
+clean tmpfs mounts on
+.I /tmp
+and
+.IR /var/tmp .
+
+In this man page, \(dqread-only\(dq means that a bind-mount with the read-only
+option is created. Other accessible files are normal bind-mounts. The
+permissions on the files are not modified.
+
+.SH OPTIONS
+The following options are supported:
+.TP
+.BR -a \ \fIfile\fR
+Make
+.I file
+accessible.
+.TP
+.BR -r \ \fIfile\fR
+Make
+.I file
+accessible but read-only.
+.TP
+.BR -t \ \fIfile\fR
+Mount a tmpfs on
+.IR file .
+.TP
+.B -n
+Do not apply the preset file accesses.
+.TP
+.B -R
+Make the current working directory read-only.
+.PP
+The order of options do not matter, however
+.B -a
+overrides
+.B -r
+and
+.BR -t ,
+while
+.B -r
+overrides
+.BR -t .
+The preset files accesses are
+.B -t
+.I /tmp
+.B -t
+.I /var/tmp
+.B -r
+.I /var/empty
+.B -r
+.I /etc/passwd
+.B -r
+.I /usr
+.B -r
+.I /bin
+.B -r
+.I /sbin
+.B -r
+.I /lib
+.B -r
+.I /lib64
+.B -r
+.I /lib32
+.B -r
+.IR /libexec ,
+however limited
+to files that exist (including broken symlinks). Additionally
+the current working directory is always accessible
+.RB ( -a
+.IR . ,
+or if
+.B -R
+is used:
+.B -r
+.IR . ),
+regardless of the use of
+.BR -n .
+
+.SH OPERANDS
+The following operands are supported:
+.TP
+.I utility
+The name of the utility to be invoked.
+.TP
+.I argument
+A string to pass as an argument for the invoked utility.
+
+.SH EXIT STATUS
+If
+.I utility
+is invoked, the exit status of
+.B fsshield
+is the exit status of
+.IR utility ;
+otherwise, the
+.B fsshield
+utility exits with one of the following values:
+.TP
+125
+An error occurred in the
+.B fsshield
+utility.
+.TP
+126
+The utility specified by
+.I utility
+was found but could not be invoked.
+.TP
+127
+The utility specified by
+.I utility
+could not be found.
+
+.SH NOTES
+The
+.IR file s
+can be any type of file, including directories,
+not just regular files.
+
+.SH SEE ALSO
+None.
